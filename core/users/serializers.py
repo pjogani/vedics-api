@@ -1,3 +1,5 @@
+# File: /Users/pjo/Documents/repos/projects/vedics-api/core/users/serializers.py
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
@@ -85,15 +87,3 @@ class CreateUserSerializer(serializers.ModelSerializer):
         UserProfile.objects.create(user=user)
 
         return user
-
-
-class GoogleAuthTokenView(APIView):
-    """
-    Once the user is authenticated via Google (allauth),
-    they can request their DRF token with this endpoint.
-    """
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        token, _ = Token.objects.get_or_create(user=request.user)
-        return Response({"token": token.key}, status=status.HTTP_200_OK)

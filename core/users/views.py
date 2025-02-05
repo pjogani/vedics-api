@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
+from core.mixins import BaseApiMixin
 
 
 class UserViewSet(mixins.CreateModelMixin,
@@ -34,15 +36,9 @@ class UserViewSet(mixins.CreateModelMixin,
         return UserSerializer
 
 
-class GoogleAuthTokenView(APIView):
-    """
-    Once the user has authenticated via Google (allauth) and has a valid session,
-    they can hit this endpoint to retrieve/refresh their DRF token.
-    """
-    permission_classes = [IsAuthenticated]
 
+class GoogleAuthTokenView(BaseApiMixin, APIView):
     def get(self, request):
-        # If the user is authenticated via session,
-        # generate or retrieve an existing auth token.
         token, _ = Token.objects.get_or_create(user=request.user)
-        return Response({"token": token.key}, status=status.HTTP_200_OK)
+        return self.successful_response({"token": token.key})
+

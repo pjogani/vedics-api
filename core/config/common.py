@@ -40,7 +40,8 @@ class Common(Configuration):
         'core.users',
         'core.conduit',
         'core.organizations',
-
+        'profiles',
+        'subscriptions',
         # For storing Celery task results
         'django_celery_results',
     )

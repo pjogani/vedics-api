@@ -40,6 +40,9 @@ urlpatterns = [
     # default redirect
     re_path(r'^$', RedirectView.as_view(url='/api/v1/', permanent=False)),
 
+    path('api/v1/subscriptions/', include('subscriptions.urls')),
+
+
     path('api/v1/google-auth-token/', GoogleAuthTokenView.as_view(), name='google_auth_token'),
 ]
 
