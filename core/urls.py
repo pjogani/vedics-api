@@ -42,7 +42,9 @@ urlpatterns = [
 
     path('api/v1/subscriptions/', include('subscriptions.urls')),
 
-
+    # predictions
+    path('api/v1/assistant/', include('assistant.urls')),   # Added
+    path('api/v1/predictions/', include('predictions.urls')),
     path('api/v1/google-auth-token/', GoogleAuthTokenView.as_view(), name='google_auth_token'),
 ]
 

@@ -9,7 +9,7 @@ class UserProfile(AuthorTimeStampedModel):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='profile'
+        related_name="profile"
     )
     date_of_birth = models.DateField(null=True, blank=True)
     time_of_birth = models.TimeField(null=True, blank=True)
@@ -17,7 +17,11 @@ class UserProfile(AuthorTimeStampedModel):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
+
+    # Optional: store the previously computed birth chart in JSON
+    birth_chart = models.JSONField(default=dict, blank=True)
     preferred_language = models.CharField(max_length=10, default='en')
+
 
     def __str__(self):
         return f"Profile of {self.user.username}"
