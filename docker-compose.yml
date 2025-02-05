@@ -1,0 +1,66 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16.4
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7.0.11-alpine
+    container_name: corestack_redis
+    ports:
+      - "6379:6379"
+
+  web:
+    build: ./
+    container_name: corestack_web
+    command: >
+      bash -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    environment:
+      - DJANGO_SECRET_KEY=local
+      - DJANGO_DEBUG=True
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - DATABASE_URL=postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build: ./
+    container_name: corestack_worker
+    # Updated the celery command to invoke via python for better environment consistency.
+    command: python -m celery -A core worker -l info
+    environment:
+      - DJANGO_SECRET_KEY=local
+      - DJANGO_DEBUG=True
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - DATABASE_URL=postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    volumes:
+      - ./:/app
+    depends_on:
+      - postgres
+      - redis
+
+  docs:
+    build: ./
+    container_name: corestack_docs
+    command: "mkdocs serve -a 0.0.0.0:8001"
+    volumes:
+      - ./:/app
+    ports:
+      - "8001:8001"

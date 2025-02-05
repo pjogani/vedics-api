@@ -1,0 +1,9 @@
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311"]
+exclude = "migrations|__pycache__|.venv|venv|build|dist"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip_glob = "migrations/*"

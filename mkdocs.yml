@@ -1,0 +1,13 @@
+site_name: core
+site_description: This forms the core stack of future django projects. Go rule the world!
+repo_url: https://github.com/pjogani/corestack
+site_dir: site
+copyright: Copyright &copy; 2020, <a href="https://github.com/pjogani">pjogani</a>.
+dev_addr: 0.0.0.0:8001
+
+nav:
+  - Home: 'index.md'
+  - API:
+    - Authentication: 'api/authentication.md'
+    - Users: 'api/users.md'
+  - Monitoring: 'monitoring.md'
