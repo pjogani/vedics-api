@@ -1,8 +1,7 @@
 import logging
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 
-from .models import ConversationMessage
+from .models import Conversation, Message
 from .openai_utils import OpenAIAPI
 
 logger = logging.getLogger(__name__)
@@ -10,66 +9,77 @@ logger = logging.getLogger(__name__)
 
 class ConversationManager:
     """
-    Manages a user's conversation by storing messages in the DB and
-    retrieving AI responses from OpenAI. Integrates logic from the 'vedic-ai'
-    approach, adapted for Django.
+    Manages a user's conversation flow, storing messages in the DB and
+    retrieving AI responses from OpenAI.
     """
 
     def __init__(self, user):
         self.user = user
         self.openai_api = OpenAIAPI()
 
-    def chat(self, session_id: str, user_input: str) -> dict:
+        # Attempt to read user's preferred language from their profile
+        self.language = "en"
+        if hasattr(user, "profile") and user.profile.preferred_language:
+            self.language = user.profile.preferred_language
+
+    def chat(self, conversation_id, user_input):
         """
-        Main entry point to handle a chat message.
-          1) Store the user's message in DB
-          2) Build conversation context from past messages
-          3) Call LLM via OpenAI to get an assistant reply
-          4) Store the assistant reply in DB
-          5) Return the reply
+        Posts a user message to a conversation and gets an AI reply.
+        If conversation_id is None or invalid for this user, creates a new conversation.
+        Returns a dict with "reply" and "conversation_id".
         """
 
-        # 1) Store user message
-        user_msg = ConversationMessage.objects.create(
-            user=self.user,
-            session_id=session_id,
+        # Retrieve or create conversation
+        conversation = None
+        if conversation_id:
+            try:
+                conversation = Conversation.objects.get(id=conversation_id, user=self.user)
+            except Conversation.DoesNotExist:
+                logger.warning(
+                    f"Conversation {conversation_id} not found or not owned by user {self.user}. "
+                    f"Creating a new conversation instead."
+                )
+
+        if not conversation:
+            conversation = Conversation.objects.create(user=self.user)
+
+        # Store user message
+        Message.objects.create(
+            conversation=conversation,
             role="user",
-            content=user_input,
+            content=user_input
         )
 
-        # 2) Build conversation context
-        # We collect recent messages from this session. You can set a max length if needed.
-        all_msgs = ConversationMessage.objects.filter(
-            user=self.user,
-            session_id=session_id
-        ).order_by("created_at")
+        # Build the conversation context
+        past_msgs = conversation.messages.order_by("created_at")
+        conversation_history = [{"role": m.role, "content": m.content} for m in past_msgs]
 
-        conversation_history = []
-        for msg in all_msgs:
-            conversation_history.append({
-                "role": msg.role,
-                "content": msg.content
-            })
+        # Insert a system message at the start about responding in the user's language
+        system_prompt = (
+            f"You are a helpful Vedic astrology assistant. "
+            f"Please respond in {self.language}."
+        )
+        conversation_history.insert(0, {"role": "system", "content": system_prompt})
 
-        # 3) Call the LLM
+        # Call OpenAI
         reply = self.openai_api.chat_completion(conversation_history)
 
-        # 4) Store assistant's reply
+        # Determine reply text (string or error dict)
         if isinstance(reply, dict) and "error" in reply:
-            # If there's an error, just store something minimal
             assistant_reply = f"[Assistant Error]: {reply.get('detail')}"
         elif isinstance(reply, dict):
-            # If it's a parsed JSON, let's store as a string
             assistant_reply = str(reply)
         else:
             assistant_reply = str(reply)
 
-        ConversationMessage.objects.create(
-            user=self.user,
-            session_id=session_id,
+        # Store assistant's reply
+        Message.objects.create(
+            conversation=conversation,
             role="assistant",
-            content=assistant_reply,
+            content=assistant_reply
         )
 
-        # 5) Return
-        return {"reply": assistant_reply}
+        return {
+            "reply": assistant_reply,
+            "conversation_id": conversation.id
+        }

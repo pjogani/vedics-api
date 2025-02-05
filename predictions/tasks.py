@@ -1,9 +1,6 @@
 from celery import shared_task
-from django.conf import settings
-from django.utils import timezone
-
 from django.contrib.auth import get_user_model
-from predictions.models import UserReading
+from .models import Prediction
 from .services.reading_service import ReadingService
 
 User = get_user_model()
@@ -13,7 +10,6 @@ User = get_user_model()
 def generate_all_readings_for_user(user_id):
     """
     A Celery task that generates multiple reading types for a given user.
-    Incorporates logic from 'vedic-ai' tasks approach.
     """
     try:
         user = User.objects.get(pk=user_id)
@@ -41,10 +37,9 @@ def generate_all_readings_for_user(user_id):
 @shared_task(name="generate_daily_reading_for_all_users")
 def generate_daily_reading_for_all_users():
     """
-    Optionally, you could run a daily job generating 'today_reading' 
-    for all active users. 
+    Optionally, you could run a daily job generating a "today" reading
+    for all active users.
     """
-
     reading_service = ReadingService()
     users = User.objects.all()
     count = 0
