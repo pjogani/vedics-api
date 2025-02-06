@@ -1,0 +1,25 @@
+[
+    {
+      "model": "subscriptions.subscriptionplan",
+      "pk": 1,
+      "fields": {
+        "name": "free",
+        "description": "Default free tier, up to 2 seats",
+        "monthly_price": "0.00",
+        "max_seats": 2,
+        "is_active": true
+      }
+    },
+    {
+      "model": "subscriptions.subscriptionplan",
+      "pk": 2,
+      "fields": {
+        "name": "premium",
+        "description": "Premium tier with more seats and features",
+        "monthly_price": "9.99",
+        "max_seats": 20,
+        "is_active": true
+      }
+    }
+  ]
+  

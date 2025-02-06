@@ -5,6 +5,7 @@ import logging
 
 import openai
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _  # <-- Added for i18n
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ class OpenAIAPI:
         """
 
         if not OPENAI_API_KEY:
-            return "OpenAI API key is missing. Please set OPENAI_API_KEY."
+            return _("OpenAI API key is missing. Please set OPENAI_API_KEY.")
 
         try:
             response = openai.ChatCompletion.create(
@@ -89,8 +90,8 @@ class OpenAIAPI:
             structured = get_structure_openai_response(ai_response)
             return structured
         except Exception as e:
-            logger.error(f"OpenAI chat_completion error: {str(e)}")
-            return {"error": "OpenAI request failed", "detail": str(e)}
+            logger.error(_("OpenAI chat_completion error: %s") % str(e))
+            return {"error": _("OpenAI request failed"), "detail": str(e)}
 
     def generate_embedding(self, text, model="text-embedding-ada-002"):
         """

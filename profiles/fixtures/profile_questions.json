@@ -1,0 +1,30 @@
+[
+    {
+      "model": "profiles.profilequestion",
+      "pk": 1,
+      "fields": {
+        "question_text": "What is your favorite color?",
+        "question_type": "text",
+        "help_text": "Enter your color preference"
+      }
+    },
+    {
+      "model": "profiles.profilequestion",
+      "pk": 2,
+      "fields": {
+        "question_text": "Have you visited a Vedic astrologer before?",
+        "question_type": "bool",
+        "help_text": "Please respond yes or no"
+      }
+    },
+    {
+      "model": "profiles.profilequestion",
+      "pk": 3,
+      "fields": {
+        "question_text": "Which languages do you speak?",
+        "question_type": "select",
+        "help_text": "Select one or more languages you are comfortable with"
+      }
+    }
+  ]
+  

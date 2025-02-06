@@ -1,5 +1,6 @@
 import logging
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _  # <-- Added for i18n
 
 from .models import Conversation, Message
 from .openai_utils import OpenAIAPI
@@ -55,10 +56,10 @@ class ConversationManager:
         conversation_history = [{"role": m.role, "content": m.content} for m in past_msgs]
 
         # Insert a system message at the start about responding in the user's language
-        system_prompt = (
-            f"You are a helpful Vedic astrology assistant. "
-            f"Please respond in {self.language}."
-        )
+        # Translators: Shown to the LLM, instructing it to respond in the user's chosen language
+        system_prompt = _("You are a helpful Vedic astrology assistant. Please respond in %(lang)s.") % {
+            "lang": self.language
+        }
         conversation_history.insert(0, {"role": "system", "content": system_prompt})
 
         # Call OpenAI

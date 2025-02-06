@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
+from django.utils.translation import gettext_lazy as _  # <-- Added
 
 from core.viewsets import BaseModelViewSet
 from .conversation_manager import ConversationManager
@@ -27,7 +28,7 @@ class ChatView(APIView):
         user_input = request.data.get("message")
 
         if not user_input:
-            return Response({"error": "message is required"}, status=400)
+            return Response({"error": _("message is required")}, status=400)
 
         manager = ConversationManager(request.user)
         result = manager.chat(conversation_id, user_input)
@@ -63,7 +64,7 @@ class ConversationViewSet(BaseModelViewSet, viewsets.ModelViewSet):
         conversation = self.get_object()
         conversation.is_active = False
         conversation.save()
-        return Response({"message": "Conversation closed."}, status=200)
+        return Response({"message": _("Conversation closed.")}, status=200)
 
 
 class MessageViewSet(BaseModelViewSet, viewsets.ModelViewSet):
