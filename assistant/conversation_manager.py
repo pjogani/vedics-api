@@ -1,5 +1,6 @@
 import logging
-from django.shortcuts import get_object_or_404
+
+from assistant.assistant import get_assistant_response
 
 from .models import Conversation, Message
 from .openai_utils import OpenAIAPI
@@ -22,7 +23,7 @@ class ConversationManager:
         if hasattr(user, "profile") and user.profile.preferred_language:
             self.language = user.profile.preferred_language
 
-    def chat(self, conversation_id, user_input):
+    def chat(self, session_id, user_input):
         """
         Posts a user message to a conversation and gets an AI reply.
         If conversation_id is None or invalid for this user, creates a new conversation.
@@ -31,17 +32,26 @@ class ConversationManager:
 
         # Retrieve or create conversation
         conversation = None
-        if conversation_id:
-            try:
-                conversation = Conversation.objects.get(id=conversation_id, user=self.user)
-            except Conversation.DoesNotExist:
-                logger.warning(
-                    f"Conversation {conversation_id} not found or not owned by user {self.user}. "
-                    f"Creating a new conversation instead."
-                )
+        if session_id:
+            conversation = Conversation.objects.filter(session_id=session_id, user=self.user).first()
 
         if not conversation:
-            conversation = Conversation.objects.create(user=self.user)
+            assistant_id = "asst_Quv8mSsNKh3wfx8GUJkX7yqx"
+            conversation = Conversation.objects.create(
+                user=self.user,
+                assistant_id=assistant_id,
+                session_id=session_id,
+            )
+
+        if conversation and not conversation.thread_id:
+            thread = self.openai_api.create_thread(metadata={"conversation_id": str(conversation.id)})
+            conversation.thread_id = thread.id
+            conversation.save()
+            user_profile = self.user.profile
+            user_info = f"This is the user's information: Birth Date: {user_profile.date_of_birth}, Birth Time: {user_profile.time_of_birth} UTC, Place of Birth: {user_profile.place_of_birth}, Latitude: {user_profile.latitude}, Longitude: {user_profile.longitude}. The responses in this thread should be strictly in {user_profile.preferred_language} language."
+            self.openai_api.add_message_to_thread(conversation.thread_id, user_info)
+            user_info = f"This is the user's birth chart: {user_profile.birth_chart}"
+            self.openai_api.add_message_to_thread(conversation.thread_id, user_info)
 
         # Store user message
         Message.objects.create(
@@ -49,28 +59,9 @@ class ConversationManager:
             role="user",
             content=user_input
         )
-
-        # Build the conversation context
-        past_msgs = conversation.messages.order_by("created_at")
-        conversation_history = [{"role": m.role, "content": m.content} for m in past_msgs]
-
-        # Insert a system message at the start about responding in the user's language
-        system_prompt = (
-            f"You are a helpful Vedic astrology assistant. "
-            f"Please respond in {self.language}."
-        )
-        conversation_history.insert(0, {"role": "system", "content": system_prompt})
-
-        # Call OpenAI
-        reply = self.openai_api.chat_completion(conversation_history)
-
-        # Determine reply text (string or error dict)
-        if isinstance(reply, dict) and "error" in reply:
-            assistant_reply = f"[Assistant Error]: {reply.get('detail')}"
-        elif isinstance(reply, dict):
-            assistant_reply = str(reply)
-        else:
-            assistant_reply = str(reply)
+        self.openai_api.add_message_to_thread(conversation.thread_id, user_input)
+        response = self.generate_reply(conversation.thread_id, conversation.assistant_id)
+        assistant_reply = str(response)
 
         # Store assistant's reply
         Message.objects.create(
@@ -83,3 +74,6 @@ class ConversationManager:
             "reply": assistant_reply,
             "conversation_id": conversation.id
         }
+
+    def generate_reply(self, thread_id, assistant_id) -> dict:
+        return get_assistant_response(thread_id, assistant_id)

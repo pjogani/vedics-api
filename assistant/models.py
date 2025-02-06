@@ -14,6 +14,9 @@ class Conversation(AuthorTimeStampedModel):
     )
     title = models.CharField(max_length=255, blank=True, default="")
     is_active = models.BooleanField(default=True)
+    session_id = models.CharField(max_length=100, blank=False, null=True)
+    thread_id = models.CharField(max_length=100, blank=False, null=True)
+    assistant_id = models.CharField(max_length=100, blank=False, null=True)
 
     def __str__(self):
         return f"Conversation {self.id} by {self.user.username}"
