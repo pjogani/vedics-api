@@ -27,18 +27,18 @@ class ChatView(BaseApiMixin, APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        conversation_id = request.data.get("conversation_id")
+        session_id = request.data.get("session_id")
         user_input = request.data.get("message")
 
         if not user_input:
             return self.error_response(message=_("message is required"), status_code=400)
 
         manager = ConversationManager(request.user)
-        result = manager.chat(conversation_id, user_input)
+        result = manager.chat(session_id, user_input)
         return self.successful_response(
             message={
                 "reply": result["reply"],
-                "conversation_id": result["conversation_id"]
+                "session_id": session_id
             },
             status_code=status.HTTP_200_OK
         )

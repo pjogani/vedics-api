@@ -1,6 +1,11 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import DailyPredictionViewSet, LongTermPredictionViewSet
 
-# In a real project you’d typically define or include a ViewSet/Router here.
+router = DefaultRouter()
+router.register(r'daily', DailyPredictionViewSet, basename='daily-prediction')
+router.register(r'longterm', LongTermPredictionViewSet, basename='longterm-prediction')
+
 urlpatterns = [
-    # Placeholder. Add your prediction-related endpoints or ViewSets here.
+    path('', include(router.urls)),
 ]

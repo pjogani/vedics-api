@@ -74,12 +74,16 @@ class AstroService:
     combining logic from 'vedic-ai' for demonstration.
     """
 
-    def calculate_birth_chart(self, date_of_birth: datetime, time_of_birth: datetime, place_of_birth: str) -> Dict[str, Any]:
+    def calculate_birth_chart(self, date_of_birth: datetime, time_of_birth: datetime, lat: float, lon: float) -> Dict[str, Any]:
         """
         Combine date + time + location to produce a simplified birth chart.
         place_of_birth can be a plain string, but the logic for geocoding is not included here.
         For real usage, store lat/long in user profile and pass them in directly.
         """
+        if not lat:
+            lat = 48.8566
+        if not lon:
+            lon = 2.3522
 
         # Suppose date_of_birth is date-only, time_of_birth is a separate time object
         # Combine into single UTC-based datetime
@@ -88,17 +92,6 @@ class AstroService:
             time_of_birth.hour, time_of_birth.minute, time_of_birth.second,
             tzinfo=timezone.utc
         )
-
-        # For demonstration, fallback lat/lon (Paris) if none provided
-        # Real code would do real geocoding or use stored lat/lon
-        lat, lon = 48.8566, 2.3522
-        # parse place_of_birth if "lat, lon" format:
-        try:
-            lat_str, lon_str = place_of_birth.split(",")
-            lat = float(lat_str.strip())
-            lon = float(lon_str.strip())
-        except Exception:
-            pass
 
         load = Loader("./skyfield_data")
         ts = load.timescale()

@@ -5,6 +5,7 @@ from datetime import datetime, date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from assistant.assistant import get_assistant_response
 from assistant.openai_utils import OpenAIAPI
 from .astro_service import AstroService
 from predictions.models import Prediction
@@ -130,24 +131,8 @@ Return JSON:
         """
 
         profile = getattr(user, "profile", None)
-        if profile and profile.date_of_birth and profile.time_of_birth:
-            # Combine date + time into a single datetime (UTC).
-            dob = profile.date_of_birth
-            tob = profile.time_of_birth
-            full_dt = datetime(
-                dob.year,
-                dob.month,
-                dob.day,
-                tob.hour,
-                tob.minute,
-                tob.second
-            )
-            place_of_birth = profile.place_of_birth or "48.8566,2.3522"  # fallback
-            birth_chart = self.astro_service.calculate_birth_chart(
-                date_of_birth=dob,
-                time_of_birth=full_dt,
-                place_of_birth=place_of_birth
-            )
+        if profile and profile.birth_chart:
+            birth_chart = profile.birth_chart
         else:
             logger.warning(f"User {user.id} missing or incomplete birth data; using fallback chart.")
             birth_chart = {}
@@ -161,17 +146,27 @@ Return JSON:
         base_prompt = self.prompts.get(reading_type, self.prompts["today_reading"])
         content = (
             f"This is the user's birth chart:\n{birth_chart}\n\n"
-            f"Respond in {user_language}. Provide a detailed reading:\n\n{base_prompt}"
+            f"Provide a detailed reading:\n\n{base_prompt}\n\n"
+            f"Response strictly should be in {user_language} language, the keys of the json should be in {user_language} language."
         )
+        # TODO: Check if assistant needs to be used instead
+        assistant_id = "asst_Hy3IbR2ctsWmirWqTlpidjqS"
+        thread = self.openai_api.create_thread(
+            metadata={"session_id": f"reading_{reading_type}"}
+        )
+        self.openai_api.add_message_to_thread(thread.id, content)
+        response = get_assistant_response(thread.id, assistant_id)
 
-        # Call OpenAI
-        messages = [
-            {"role": "system", "content": "You are a helpful Vedic astrology assistant."},
-            {"role": "user", "content": content},
-        ]
-        response = self.openai_api.chat_completion(messages)
+        if not response:
+          response = self.openai_api.generate_extracted_info(
+              prompt="You are a helpful Vedic astrology assistant.",
+              content=content
+          )
+          if response["status"] == "SUCCESS":
+              response = response["response"]
 
         if not isinstance(response, dict):
+            response = response or {}
             # If not a structured JSON, wrap in dict
             response = {"raw": str(response)}
 
@@ -182,4 +177,4 @@ Return JSON:
             content=response
         )
 
-        return pred_obj.content
+        return pred_obj

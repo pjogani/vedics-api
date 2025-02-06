@@ -13,8 +13,11 @@ class Conversation(AuthorTimeStampedModel):
         on_delete=models.CASCADE,
         related_name="conversations"
     )
-    title = models.CharField(_("Title"), max_length=255, blank=True, default="")
-    is_active = models.BooleanField(_("Is Active"), default=True)
+    title = models.CharField(max_length=255, blank=True, default="")
+    is_active = models.BooleanField(default=True)
+    session_id = models.CharField(max_length=100, blank=False, null=True)
+    thread_id = models.CharField(max_length=100, blank=False, null=True)
+    assistant_id = models.CharField(max_length=100, blank=False, null=True)
 
     def __str__(self):
         # Translators: This is displayed in the admin or logs as an identifying string
