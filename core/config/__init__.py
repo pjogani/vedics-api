@@ -1,4 +1,14 @@
-from .local import Local  # noqa
+from .common import Common
 from .production import Production  # noqa
-# core package init
 
+# Attempt to import Local; fallback if it doesn't exist
+try:
+    from .local import Local  # noqa
+except ImportError:
+    # Provide a basic Local class so "DJANGO_CONFIGURATION=Local" won't break if local.py is missing.
+    class Local(Common):
+        DEBUG = True
+        # Add any local overrides you need. Or leave as pass.
+        pass
+
+# core package init

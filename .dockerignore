@@ -1,3 +1,40 @@
-.*
+# Ignore Git and IDE metadata
+.git
+.gitignore
+*.iml
+.idea
+.vscode
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+
+# Virtualenvs
+venv/
+.venv/
+env/
+ENV/
+
+# Node stuff if present
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# By default, do not include .env files in the build context
+.env*
+!env.sample
+
+# Coverage or test output
+coverage/
+.coverage
+.coverage.*
+
+# You may choose to allow .coveragerc if needed
 !.coveragerc
-!.env
