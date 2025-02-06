@@ -20,8 +20,14 @@ class UserProfile(AuthorTimeStampedModel):
 
     # Optional: store the previously computed birth chart in JSON
     birth_chart = models.JSONField(default=dict, blank=True)
+
+    # Language for i18n or prompt usage
     preferred_language = models.CharField(max_length=10, default='en')
 
+    allow_org_access = models.BooleanField(
+        default=False,
+        help_text="If True, other members of the same Organization can view this profile."
+    )
 
     def __str__(self):
         return f"Profile of {self.user.username}"

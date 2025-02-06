@@ -42,4 +42,4 @@ celery==5.3.4
 
 black==23.7.0
 isort==5.12.0
-openai
+openai==1.12.0
