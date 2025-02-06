@@ -1,16 +1,20 @@
+# File: /Users/pjo/Documents/repos/projects/vedics-api/assistant/views.py
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
+from django.utils.translation import gettext_lazy as _
 
 from core.viewsets import BaseModelViewSet
+from core.mixins import BaseApiMixin
 from .conversation_manager import ConversationManager
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 
 
-class ChatView(APIView):
+class ChatView(BaseApiMixin, APIView):
     """
     Simple endpoint for sending a user message and getting the AI reply.
     POST data:
@@ -26,14 +30,17 @@ class ChatView(APIView):
         session_id = request.data.get("session_id")
         user_input = request.data.get("message")
 
+        if not user_input:
+            return self.error_response(message=_("message is required"), status_code=400)
+
         manager = ConversationManager(request.user)
         result = manager.chat(session_id, user_input)
-        return Response(
-            {
+        return self.successful_response(
+            message={
                 "reply": result["reply"],
-                "conversation_id": result["conversation_id"]
+                "session_id": session_id
             },
-            status=status.HTTP_200_OK
+            status_code=status.HTTP_200_OK
         )
 
 
@@ -46,7 +53,7 @@ class ConversationViewSet(BaseModelViewSet, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Only return conversations belonging to this user.
+        # Only return conversations belonging to this user and not marked deleted.
         return Conversation.objects.filter(user=self.request.user, is_deleted=False)
 
     def perform_create(self, serializer):
@@ -60,7 +67,10 @@ class ConversationViewSet(BaseModelViewSet, viewsets.ModelViewSet):
         conversation = self.get_object()
         conversation.is_active = False
         conversation.save()
-        return Response({"message": "Conversation closed."}, status=200)
+        return self.successful_response(
+            message={"message": _("Conversation closed.")},
+            status_code=status.HTTP_200_OK
+        )
 
 
 class MessageViewSet(BaseModelViewSet, viewsets.ModelViewSet):

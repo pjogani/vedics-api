@@ -24,6 +24,10 @@ class UserProfile(AuthorTimeStampedModel):
     area_of_interests = models.JSONField(default=list, blank=True)
     long_term_reading_status = models.CharField(max_length=10, default="pending")
 
+    allow_org_access = models.BooleanField(
+        default=False,
+        help_text="If True, other members of the same Organization can view this profile."
+    )
 
     def __str__(self):
         return f"Profile of {self.user.username}"

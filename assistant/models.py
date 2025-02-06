@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from core.mixins import AuthorTimeStampedModel
+from django.utils.translation import gettext_lazy as _  # <-- Added for translations
 
 class Conversation(AuthorTimeStampedModel):
     """
@@ -19,7 +20,11 @@ class Conversation(AuthorTimeStampedModel):
     assistant_id = models.CharField(max_length=100, blank=False, null=True)
 
     def __str__(self):
-        return f"Conversation {self.id} by {self.user.username}"
+        # Translators: This is displayed in the admin or logs as an identifying string
+        return _("Conversation %(id)s by %(username)s") % {
+            "id": self.id,
+            "username": self.user.username
+        }
 
 
 class Message(AuthorTimeStampedModel):
@@ -31,8 +36,12 @@ class Message(AuthorTimeStampedModel):
         on_delete=models.CASCADE,
         related_name="messages"
     )
-    role = models.CharField(max_length=50)  # e.g. "user", "assistant", "system"
-    content = models.TextField()
+    role = models.CharField(_("Role"), max_length=50)  # e.g. "user", "assistant", "system"
+    content = models.TextField(_("Content"))
 
     def __str__(self):
-        return f"Message {self.id} in Conversation {self.conversation_id} - {self.role}"
+        return _("Message %(id)s in Conversation %(conv_id)s - %(role)s") % {
+            "id": self.id,
+            "conv_id": self.conversation_id,
+            "role": self.role
+        }

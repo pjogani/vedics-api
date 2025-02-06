@@ -1,26 +1,43 @@
 from rest_framework.permissions import IsAuthenticated
 from core.viewsets import BaseModelViewSet
+from django.db import models
 from .models import UserProfile, ProfileQuestion, ProfileAnswer
 from .serializers import (
     UserProfileSerializer,
     ProfileQuestionSerializer,
     ProfileAnswerSerializer
 )
+from .permissions import ProfilePermission
+
 
 class UserProfileViewSet(BaseModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    permission_classes = [IsAuthenticated]
+    # Now we enforce both standard authentication and our custom profile permission:
+    permission_classes = [IsAuthenticated, ProfilePermission]
 
     def get_queryset(self):
         """
-        - Superusers can view all profiles.
-        - Regular users can only view their own profile.
+        - Superusers see all profiles.
+        - Normal users see:
+          1) Their own profile
+          2) Any profile that has allow_org_access=True and belongs to
+             at least one shared Organization.
         """
         user = self.request.user
         if user.is_superuser:
-            return UserProfile.objects.all()
-        return UserProfile.objects.filter(user=user)
+            return super().get_queryset()
+
+        # Find the orgs the user belongs to:
+        user_org_ids = user.team_memberships.values_list('team__organization_id', flat=True)
+
+        return UserProfile.objects.filter(
+            models.Q(user=user)
+            | (
+                models.Q(allow_org_access=True)
+                & models.Q(user__team_memberships__team__organization_id__in=user_org_ids)
+            )
+        ).distinct()
 
 
 class ProfileQuestionViewSet(BaseModelViewSet):

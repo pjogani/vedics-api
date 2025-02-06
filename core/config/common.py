@@ -6,6 +6,7 @@ import dj_database_url
 from configurations import Configuration
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from django.utils.translation import gettext_lazy as _  # <-- Added for i18n
 
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
@@ -81,11 +82,25 @@ class Common(Configuration):
     APPEND_SLASH = False
     TIME_ZONE = 'UTC'
     LANGUAGE_CODE = 'en-us'
-    USE_I18N = False
+    # Turn on i18n (previously was False)
+    USE_I18N = True
     USE_L10N = True
     USE_TZ = True
     LOGIN_REDIRECT_URL = '/'
     LOGOUT_REDIRECT_URL = '/'
+
+    # Added explicit languages you wish to support
+    LANGUAGES = (
+        ('en', _('English')),
+        ('hi', _('Hindi')),
+        ('te', _('Telugu')),
+        ('ta', _('Tamil')),
+    )
+
+    # Where Django looks for .po/.mo files
+    LOCALE_PATHS = [
+        os.path.join(BASE_DIR, 'locale'),
+    ]
 
     STATIC_ROOT = os.path.normpath(join(dirname(BASE_DIR), 'static'))
     STATICFILES_DIRS = []
