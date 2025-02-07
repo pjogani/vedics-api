@@ -1,9 +1,10 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from core.conduit.utils import get_coordinates
+from predictions.models import Prediction
 from .models import UserProfile
 from predictions.services.astro_service import AstroService
-from predictions.tasks import generate_all_readings_for_user
+from predictions.tasks import READING_TYPES, generate_missing_predictions_for_user, generate_missing_predictions_for_user
 
 @receiver(pre_save, sender=UserProfile)
 def update_coordinates(sender, instance, **kwargs):
@@ -56,4 +57,8 @@ def generate_readings(sender, instance, created, **kwargs):
     Generate readings when birth chart is updated
     """
     if hasattr(instance, '_generate_readings'):
-        generate_all_readings_for_user.delay(instance.user.id)
+        Prediction.objects.filter(
+            user_id=instance.user.id,
+            prediction_type__in=READING_TYPES
+        ).update(is_deleted=True)
+        generate_missing_predictions_for_user.delay(instance.user.id)
