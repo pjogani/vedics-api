@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 
 from assistant.assistant import get_assistant_response
 from assistant.openai_utils import OpenAIAPI
+from predictions.constants import PROMPT_MAPPING
 from .astro_service import AstroService
 from predictions.models import Prediction
 
@@ -23,104 +24,8 @@ class ReadingService:
     def __init__(self):
         self.astro_service = AstroService()
         self.openai_api = OpenAIAPI()
-        self.prompts = {
-            "core_personality_and_life_path": """
-You are a Vedic astrology expert. Analyze the provided birth chart to describe:
-1. Core personality traits and life path
-2. Social perception and past life influences
+        self.prompts = PROMPT_MAPPING
 
-Return JSON only with this shape:
-{
-  "core_personality_and_life_path": {
-    "traits": [...],
-    "strengths": [...],
-    "weaknesses": [...],
-    "social_perception": "...",
-    "past_life_influence": "..."
-  }
-}""",
-
-            "career_success_and_wealth": """
-You are a Vedic astrology expert. Analyze the provided birth chart for career insights:
-1. Career success and wealth potential
-2. Foreign opportunities
-3. Business vs employment
-
-Return JSON:
-{
-  "career_success_and_wealth": {
-    "ideal_professions": [...],
-    "financial_growth": { "trend": "...", "wealth_accumulation": "..." },
-    "foreign_opportunities": "...",
-    "career_transformation": { "expected_age_range": "...", "prediction": "..." },
-    "business_vs_job": "..."
-  }
-}""",
-
-            "relationships_love_and_marriage": """
-You are a Vedic astrology expert. Analyze the provided birth chart for relationship insights:
-Return JSON:
-{
-  "relationships_love_and_marriage": {
-    "traits_in_relationships": [...],
-    "marriage": {
-      "prediction": "...",
-      "partner_traits": [...],
-      "challenges": "..."
-    },
-    "romantic_influences": "..."
-  }
-}""",
-
-            "health_and_wellbeing": """
-You are a Vedic astrology expert. Analyze the birth chart for health insights:
-Return JSON:
-{
-  "health_and_wellbeing": {
-    "concerns": [...],
-    "recommendations": [...],
-    "long_term_health": "..."
-  }
-}""",
-
-            "challenges_and_remedies": """
-You are a Vedic astrology expert. Analyze the birth chart:
-Return JSON:
-{
-  "challenges_and_remedies": {
-    "challenges": [...],
-    "remedies": {
-      "mantras": [...],
-      "spiritual_practices": [...],
-      "astrological_recommendations": [...]
-    }
-  }
-}""",
-
-            "major_life_periods": """
-You are a Vedic astrology expert. Analyze the birth chart for key life stages:
-Return JSON:
-{
-  "major_life_periods": {
-    "early_life": "...",
-    "mid_life": "...",
-    "later_years": "..."
-  }
-}""",
-
-            "today_reading": """
-You are a Vedic astrology expert. Provide today's reading:
-Return JSON:
-{
-  "today_reading": {
-    "general_insights": "...",
-    "color_of_the_day": "...",
-    "favorable_activities": [...],
-    "challenging_aspects": [...],
-    "remedies_for_the_day": [...]
-  }
-}"""
-        }
 
     def generate_reading(self, user: Any, reading_type: str = "today_reading") -> Dict[str, Any]:
         """

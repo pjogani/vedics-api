@@ -35,14 +35,6 @@ class DailyPredictionSerializer(PredictionSerializer):
 
 
 class LongTermPredictionSerializer(PredictionSerializer):
-    READING_TYPES = [
-        "core_personality_and_life_path",
-        "career_success_and_wealth",
-        "relationships_love_and_marriage",
-        "health_and_wellbeing",
-        "challenges_and_remedies",
-        "major_life_periods"
-    ]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

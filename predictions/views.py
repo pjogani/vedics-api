@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
 from core.viewsets import BaseModelViewSet
+from predictions.tasks import READING_TYPES
 from .models import Prediction
 from .serializers import DailyPredictionSerializer, LongTermPredictionSerializer
 
@@ -40,7 +41,7 @@ class LongTermPredictionViewSet(BaseModelViewSet):
     def get_queryset(self):
         return Prediction.objects.filter(
             user=self.request.user,
-            prediction_type__in=LongTermPredictionSerializer.READING_TYPES,
+            prediction_type__in=READING_TYPES,
             is_deleted=False
         )
 

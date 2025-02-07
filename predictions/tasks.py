@@ -6,12 +6,16 @@ from .services.reading_service import ReadingService
 User = get_user_model()
 
 READING_TYPES = [
-    "core_personality_and_life_path",
-    "career_success_and_wealth",
-    "relationships_love_and_marriage",
-    "health_and_wellbeing",
-    "challenges_and_remedies",
-    "major_life_periods"
+    "career_finance",
+    "relationships_love",
+    "health_wellness",
+    "spiritual_growth",
+    "strengths_weaknesses",
+    "challenges_remedies",
+    "family_social",
+    "major_life_periods",
+    "travel_settlements",
+    "wealth_luck",
 ]
 
 @shared_task(name="generate_missing_predictions_for_user")
