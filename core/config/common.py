@@ -29,6 +29,7 @@ class Common(Configuration):
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'corsheaders',
         'rest_framework',
         'rest_framework.authtoken',
         'django_filters',
@@ -52,6 +53,7 @@ class Common(Configuration):
     SITE_ID = 1
 
     MIDDLEWARE = (
+        'corsheaders.middleware.CorsMiddleware',
         'core.middleware.UpstreamUserContextMiddleware',
         'core.middleware.LanguageMiddleware',
         'core.middleware.OrganizationAndRoleMiddleware',
