@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# set -ex
+
+# Examples:
+# `environment=uat ./run`
+# `environment=staging ./run exec web ash`
+# `./run` => Will run in dev mode
+
+# You can also add `environment` to `.env` file in project directory
+
+# Source env file if it's there
+[[ -f ".env" ]] && source ".env"
+
+environment=${environment-dev}
+
+if [[ ! -z $ENABLE_BUILDKIT ]]; then
+    export DOCKER_BUILDKIT=1
+    export COMPOSE_DOCKER_CLI_BUILD=1
+fi
+
+echo "Running for ${environment} environment..."
+base_command="docker compose"
+
+if [[ $? -ne 0 ]]; then
+    echo $base_command
+    echo "Aborted!"
+    exit 1
+fi
+
+if [[ $# -eq 0 ]]; then
+    COMMAND="up"
+else
+    case $1 in
+        update)
+            eval "$base_command up -d --build"
+            exit 0
+            ;;
+        migrate)
+            eval "$base_command exec web python manage.py migrate"
+            exit 0
+            ;;
+        shell)
+            eval "$base_command exec web python manage.py shell"
+            exit 0
+            ;;
+        makemigrations)
+            eval "$base_command exec web python manage.py makemigrations $2 $3"
+            exit 0
+            ;;
+        *)
+        COMMAND=$@
+
+    esac
+fi
+
+eval "$base_command $COMMAND"

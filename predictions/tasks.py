@@ -13,7 +13,6 @@ READING_TYPES = [
     "strengths_weaknesses",
     "challenges_remedies",
     "family_social",
-    "major_life_periods",
     "travel_settlements",
     "wealth_luck",
 ]
