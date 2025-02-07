@@ -43,16 +43,9 @@ def generate_missing_predictions_for_user(user_id):
     user_profile.save()
 
     for reading_type in missing_types:
-        prediction = reading_service.generate_reading(
+        reading_service.generate_reading(
             user=user,
             reading_type=reading_type
-        )
-        new_predictions.append(
-            Prediction.objects.create(
-                user=user,
-                prediction_type=reading_type,
-                content=prediction.content
-            )
         )
 
     user_profile.long_term_reading_status = "completed"
