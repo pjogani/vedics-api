@@ -22,7 +22,7 @@ class UserProfile(AuthorTimeStampedModel):
     birth_chart = models.JSONField(default=dict, blank=True)
     preferred_language = models.CharField(max_length=10, default='english')
     area_of_interests = models.JSONField(default=list, blank=True)
-    long_term_reading_status = models.CharField(max_length=10, default="pending")
+    long_term_reading_status = models.CharField(max_length=10, default="started")
 
     allow_org_access = models.BooleanField(
         default=False,
