@@ -11,7 +11,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from core.users.views import UserViewSet, GoogleAuthTokenView
+from core.users.views import UserViewSet, GoogleAuthTokenView, GoogleLoginView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/v1/assistant/', include('assistant.urls')),   # Added
     path('api/v1/predictions/', include('predictions.urls')),
     path('api/v1/google-auth-token/', GoogleAuthTokenView.as_view(), name='google_auth_token'),
+    path('api/v1/auth/google/', GoogleLoginView.as_view(), name='google_login'),
 ]
 
 if settings.DEBUG:

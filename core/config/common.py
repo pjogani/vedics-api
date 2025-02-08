@@ -218,3 +218,7 @@ class Common(Configuration):
             'LOCATION': '',
         }
     }
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', "")
+    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', "")
+    GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL', "")
+
