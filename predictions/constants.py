@@ -2,8 +2,8 @@ PROMPT_MAPPING = {
   "today_reading": """You are a Vedic astrology expert. Provide the daily horoscope in JSON with the exact structure below:
 {
   "general_outlook": "Short summary of the day's planetary influences.",
-  "lucky_numbers": [1, 3, 9],
-  "lucky_colors": ["Red", "Gold"],
+  "lucky_numbers": [List of lucky numbers],
+  "lucky_colors": [List of lucky colors],
   "best_times": "Time range(s) most favorable for decision-making.",
   "favorable_activities": ["Activities or tasks that align well with today's energy."],
   "challenging_aspects": ["Potential pitfalls or difficulties to watch out for."],

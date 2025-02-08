@@ -20,7 +20,7 @@ class UserProfile(AuthorTimeStampedModel):
 
     # Optional: store the previously computed birth chart in JSON
     birth_chart = models.JSONField(default=dict, blank=True)
-    preferred_language = models.CharField(max_length=10, default='english')
+    preferred_language = models.CharField(max_length=50, default='english')
     area_of_interests = models.JSONField(default=list, blank=True)
     long_term_reading_status = models.CharField(max_length=10, default="started")
 

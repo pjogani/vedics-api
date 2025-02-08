@@ -57,6 +57,7 @@ services:
     depends_on:
       - postgres
       - redis
+    restart: always
 
   docs:
     build: ./

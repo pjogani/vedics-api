@@ -47,6 +47,7 @@ def update_coordinates(sender, instance, **kwargs):
         instance.latitude = coordinates['latitude']
         instance.longitude = coordinates['longitude']
         instance.birth_chart = birth_chart
+        instance.long_term_reading_status = 'reeval'
         # Schedule task to generate readings after save
         instance._generate_readings = True  # Flag to use in post_save
 

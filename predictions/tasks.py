@@ -34,7 +34,6 @@ def generate_missing_predictions_for_user(user_id):
     )
 
     missing_types = set(READING_TYPES) - existing_types
-    new_predictions = []
     if (not missing_types or user_profile.long_term_reading_status == "pending"):
         return
 
