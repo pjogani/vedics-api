@@ -71,9 +71,12 @@ class ReadingService:
               response = response["response"]
 
         if not isinstance(response, dict):
-            response = response or {}
-            # If not a structured JSON, wrap in dict
-            response = {"raw": str(response)}
+            self.openai_api.add_message_to_thread(thread.id, "Please respond with a valid JSON object.")
+            response = get_assistant_response(thread.id, assistant_id)
+            if response and not isinstance(response, dict):
+                response = {"raw": str(response)}
+            else:
+                response = response or {}
 
         # Store the new reading
         pred_obj = Prediction.objects.create(
