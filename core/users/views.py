@@ -14,8 +14,7 @@ from .permissions import IsUserOrSuperuserOrCreate
 from dj_rest_auth.registration.views import SocialLoginView
 from django.conf import settings
 from google.oauth2 import id_token
-from google.auth.transport import requests
-
+import requests
 
 class UserViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
@@ -67,30 +66,43 @@ class GoogleAuthTokenView(BaseApiMixin, APIView):
 
 class GoogleLoginView(SocialLoginView):
     def post(self, request, *args, **kwargs):
-        token = request.data.get('access_token')
-        if not token:
+        access_token = request.data.get('access_token')
+        if not access_token:
             return Response(
-                {'error': 'No token provided'},
+                {'error': 'No access token provided'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        idinfo = id_token.verify_oauth2_token(
-            token, 
-            requests.Request(), 
-            settings.GOOGLE_CLIENT_ID
+        # Fetch user info from Google using the access token
+        userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+        resp = requests.get(
+            userinfo_url, 
+            headers={"Authorization": f"Bearer {access_token}"}
         )
-        # Add verified email to request data
-        request.data['email'] = idinfo['email']
+        if resp.status_code != 200:
+            return Response(
+                {'error': 'Failed to fetch user info from Google'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        google_data = resp.json()
+        # Typically includes keys like 'email', 'picture', 'name' etc.
+        email = google_data.get('email')
+        if not email:
+            return Response(
+                {'error': 'Email not provided by Google'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Create user if doesn't exist
         try:
-            user = User.objects.get(email=idinfo['email'])
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
             random_password = uuid.uuid4().hex[:8]
             serializer = CreateUserSerializer(data={
-                'username': idinfo['email'].split('@')[0],
-                'email': idinfo['email'],
-                'password': random_password # Password not needed for social auth
+                'username': email.split('@')[0],
+                'email': email,
+                'password': random_password
             })
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
