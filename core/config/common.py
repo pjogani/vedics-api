@@ -46,6 +46,7 @@ class Common(Configuration):
         'subscriptions.apps.SubscriptionsConfig',
         'predictions.apps.PredictionsConfig',
         'assistant.apps.AssistantConfig',
+        'django_extensions',
         # For storing Celery task results
         'django_celery_results',
     )
@@ -221,4 +222,7 @@ class Common(Configuration):
     GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', "")
     GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', "")
     GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL', "")
+
+    SHELL_PLUS = "ipython"
+    SHELL_PLUS_PRINT_SQL_TRUNCATE = 10000
 

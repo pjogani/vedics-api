@@ -48,3 +48,5 @@ openai==1.56.1
 
 dj-rest-auth>=4.0.1
 google-auth>=2.22.0
+
+django-extensions==3.2.3

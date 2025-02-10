@@ -3,7 +3,9 @@ services:
   postgres:
     image: postgres:16.4
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -28,7 +30,7 @@ services:
       - DJANGO_DEBUG=True
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
+      - POSTGRES_PASSWORD=postgres_password 
       - DATABASE_URL=postgres
       - CELERY_BROKER_URL=redis://redis:6379/0
     volumes:
@@ -49,7 +51,7 @@ services:
       - DJANGO_DEBUG=True
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=
+      - POSTGRES_PASSWORD=postgres_password
       - DATABASE_URL=postgres
       - CELERY_BROKER_URL=redis://redis:6379/0
     volumes:
