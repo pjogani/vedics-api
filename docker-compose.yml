@@ -30,7 +30,7 @@ services:
       - DJANGO_DEBUG=True
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres_password 
+      - POSTGRES_PASSWORD=postgres_password
       - DATABASE_URL=postgres
       - CELERY_BROKER_URL=redis://redis:6379/0
     volumes:

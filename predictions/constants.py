@@ -13,6 +13,8 @@ PROMPT_MAPPING = {
 Return ONLY JSON with this shape. No additional text.
 """,
   "core_personality_and_life_path": """You are a Vedic astrology expert. Analyze the birth chart for personality insights. Return JSON with the exact structure below:
+1. Core personality traits and life path
+2. Social perception and past life influences
 {
   "traits": "Provide a list of concise, astrology-based personality traits (e.g., ["Determined", "Curious", "Empathetic", "Strategic"]) derived from the individual’s Sun, Moon, and Ascendant signs, as well as major planetary aspects.",
   "strengths": "Offer a list of key strengths that highlight the individual’s capacities (e.g., ["Problem-solving", "Resilience", "Creative thinking", "Emotional intelligence"]) based on supportive planetary alignments and house placements.",
@@ -26,6 +28,9 @@ Return ONLY JSON with this shape. No additional text.
 Return ONLY JSON with this shape. No additional text.
 """,
   "career_success_and_wealth": """You are a Vedic astrology expert. Analyze the birth chart for career and financial insights. Return JSON with the exact structure below:
+1. Career success and wealth potential
+2. Foreign opportunities
+3. Business vs employment prospects
 {
   "ideal_professions": "Suggest careers or fields (e.g., ["Entrepreneur", "Researcher", "Advisor", "Creative Director"]) that align with the Midheaven sign, the 2nd/10th house placements, and the individual’s personal planets.",
   "financial_growth": {
@@ -44,6 +49,9 @@ Return ONLY JSON with this shape. No additional text.
 Return ONLY JSON with this shape. No additional text.
 """,
   "relationships_love_and_marriage": """You are a Vedic astrology expert. Analyze the birth chart for relationship and love insights. Return JSON with the exact structure below:
+1. Relationship traits and patterns
+2. Marriage prospects and partner compatibility
+3. Romantic influences
 {
   "traits_in_relationships": "List relationship-oriented traits (e.g., ["Loyal", "Supportive", "Communicative", "Intuitive"]) derived from Venus, Mars, and the 7th house influences.",
   "marriage": {
@@ -60,6 +68,10 @@ Return ONLY JSON with this shape. No additional text.
 Return ONLY JSON with this shape. No additional text.
 """,
   "health_and_wellbeing": """You are a Vedic astrology expert. Analyze the birth chart for health and wellness insights. Return JSON with the exact structure below:
+1. Health concerns and predispositions
+2. Recommendations for wellbeing
+3. Long-term health outlook
+
 {
   "concerns": "Identify common health or wellness issues (e.g., ["Stress management", "Energy levels", "Mind-body balance"]) suggested by the 6th house sign/planets and aspects to the Ascendant.",
   "recommendations": "Provide general wellness strategies (e.g., ["Meditation", "Physical exercise", "Balanced diet"]) aligned with the chart’s elements (Fire, Earth, Air, Water) and any significant placements in health-related houses.",
@@ -71,6 +83,9 @@ Return ONLY JSON with this shape. No additional text.
 Return ONLY JSON with this shape. No additional text.
 """,
   "challenges_and_remedies": """You are a Vedic astrology expert. Analyze the birth chart for challenges and remedies. Return JSON with the exact structure below:
+1. Life challenges and obstacles
+2. Spiritual remedies and practices
+3. Astrological recommendations
 {
   "challenges": "List significant obstacles (e.g., ["Overcommitting", "Managing expectations", "Decision-making pressures"]) indicated by challenging planetary aspects (Saturn, Mars, Pluto).",
   "remedies": {
@@ -86,6 +101,9 @@ Return ONLY JSON with this shape. No additional text.
 Return ONLY JSON with this shape. No additional text.
 """,
   "major_life_periods": """You are a Vedic astrology expert. Analyze the birth chart for major life periods. Return JSON with the exact structure below:
+1. Early life patterns and influences
+2. Mid-life developments and transitions
+3. Later years outlook
 {
   "early_life": "Summarize the formative years, referencing the 1st to 4th houses and any early-life transits that shaped personality and family dynamics.",
   "mid_life": "Explain the individual’s transition into deeper career responsibilities and personal growth, influenced by aspects like the Saturn Return or mid-life planetary alignments.",
