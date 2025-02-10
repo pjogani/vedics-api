@@ -8,10 +8,10 @@ User = get_user_model()
 READING_TYPES = [
     "core_personality_and_life_path",
     "career_success_and_wealth",
-    "relationships_love_and_marriage",
     "health_and_wellbeing",
-    "challenges_and_remedies",
+    "relationships_love_and_marriage",
     "major_life_periods",
+    "challenges_and_remedies",
 ]
 
 @shared_task(name="generate_missing_predictions_for_user")
@@ -36,6 +36,7 @@ def generate_missing_predictions_for_user(user_id):
 
     user_profile.long_term_reading_status = "pending"
     user_profile.save()
+    missing_types = sorted(missing_types, key=lambda x: READING_TYPES.index(x))
 
     for reading_type in missing_types:
         reading_service.generate_reading(

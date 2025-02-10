@@ -10,6 +10,9 @@ from django.utils.translation import gettext_lazy as _  # <-- Added for i18n
 
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 class Common(Configuration):
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'CHANGEME!!!')
 
@@ -73,12 +76,12 @@ class Common(Configuration):
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'corestack',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'localhost',
-            'PORT': '5432',
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'vedic_db',
+            'USER': 'vedic_user',
+            'PASSWORD': 'vedic_password',
+            'HOST': 'db',
+            'PORT': '3306',
         }
     }
 

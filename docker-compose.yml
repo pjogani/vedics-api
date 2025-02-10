@@ -1,15 +1,17 @@
 version: "3.9"
 services:
-  postgres:
-    image: postgres:16.4
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  db:
+    image: mysql:8.0
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=vedic_db
+      - MYSQL_USER=vedic_user
+      - MYSQL_PASSWORD=vedic_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+
 
   redis:
     image: redis:7.0.11-alpine
@@ -28,17 +30,13 @@ services:
     environment:
       - DJANGO_SECRET_KEY=local
       - DJANGO_DEBUG=True
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres_password
-      - DATABASE_URL=postgres
       - CELERY_BROKER_URL=redis://redis:6379/0
     volumes:
       - ./:/app
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
+      - db
       - redis
 
   worker:
@@ -49,26 +47,13 @@ services:
     environment:
       - DJANGO_SECRET_KEY=local
       - DJANGO_DEBUG=True
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres_password
-      - DATABASE_URL=postgres
       - CELERY_BROKER_URL=redis://redis:6379/0
     volumes:
       - ./:/app
     depends_on:
-      - postgres
+      - db
       - redis
     restart: always
 
-  docs:
-    build: ./
-    container_name: corestack_docs
-    command: "mkdocs serve -a 0.0.0.0:8001"
-    volumes:
-      - ./:/app
-    ports:
-      - "8001:8001"
-
 volumes:
-  postgres_data:
+  mysql_data:
