@@ -2,6 +2,8 @@
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+
+from core.conduit.utils import get_coordinates
 from .models import UserProfile, ProfileQuestion, ProfileAnswer
 
 User = get_user_model()
@@ -21,6 +23,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     user = UserSerializer(read_only=True)
     user_id = serializers.UUIDField(write_only=True, required=False)
+
+    def validate_place_of_birth(self, value):
+        """
+        Validate place_of_birth by checking if valid coordinates can be obtained.
+        """
+        if value:
+            coordinates = get_coordinates(value)
+            lat = coordinates['latitude']
+            lon = coordinates['longitude']
+            if lat == 0 and lon == 0:
+                raise serializers.ValidationError("Invalid Place of birth")
+        return value
+
 
     class Meta:
         model = UserProfile
