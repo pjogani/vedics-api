@@ -82,6 +82,10 @@ class Common(Configuration):
             'PASSWORD': 'vedic_password',
             'HOST': 'db',
             'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
+            },
         }
     }
 

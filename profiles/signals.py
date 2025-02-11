@@ -1,5 +1,7 @@
+from datetime import timezone
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 from core.conduit.utils import get_coordinates
 from predictions.models import Prediction
 from .models import UserProfile
@@ -14,6 +16,10 @@ def update_coordinates(sender, instance, **kwargs):
     if not instance.pk:  # New instance
         if instance.place_of_birth:
             coordinates = get_coordinates(instance.place_of_birth)
+            lat = coordinates['latitude']
+            lon = coordinates['longitude']
+            if lat == 0 and lon == 0:
+                raise ValidationError({"place_of_birth": "Invalid Place of birth"})
             birth_chart = AstroService().calculate_birth_chart(
                 date_of_birth=instance.date_of_birth,
                 time_of_birth=instance.time_of_birth,
@@ -58,8 +64,9 @@ def generate_readings(sender, instance, created, **kwargs):
     Generate readings when birth chart is updated
     """
     if hasattr(instance, '_generate_readings'):
+        reading_types = READING_TYPES + ["todays_reading"]
         Prediction.objects.filter(
             user_id=instance.user.id,
-            prediction_type__in=READING_TYPES
+            prediction_type__in=reading_types
         ).update(is_deleted=True)
         generate_missing_predictions_for_user.delay(instance.user.id)
